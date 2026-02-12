@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useProducts } from '../hooks/useProducts';
 
 const ProductsPage = () => {
   const { data, isLoading, isError } = useProducts();
+  const [search, setSearch] = useState('');
 
   if (isLoading) {
     return <p className="p-6">Cargando productos...</p>;
@@ -11,12 +13,24 @@ const ProductsPage = () => {
     return <p className="p-6 text-red-500">Error al cargar productos</p>;
   }
 
+  const filteredProducts = data?.filter((product) =>
+    product.title.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Productos</h1>
 
+      <input
+        type="text"
+        placeholder="Buscar producto..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="mb-6 w-full max-w-md rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {data?.map((product) => (
+        {filteredProducts?.map((product) => (
           <div
             key={product.id}
             className="border rounded-xl p-4 shadow hover:shadow-lg transition"
