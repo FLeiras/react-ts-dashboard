@@ -6,6 +6,8 @@ import './index.css';
 
 const queryClient = new QueryClient();
 
+document.documentElement.setAttribute('data-theme', 'dark');
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
