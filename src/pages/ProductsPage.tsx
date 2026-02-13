@@ -1,66 +1,56 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import ProductCard from '../components/ProductCard';
+import { getProducts } from '../services/products';
+import type { Product } from '../types/Product';
 
-import { useProducts } from '../hooks/useProducts';
-// import ThemeToggle from '../components/ThemeToggle';
+const ITEMS_PER_PAGE = 6;
 
-const ProductsPage = () => {
-  const { data, isLoading, isError } = useProducts();
-  const [search, setSearch] = useState('');
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
 
-  if (isLoading) {
-    return <p className="p-6">Cargando productos...</p>;
-  }
+  useEffect(() => {
+    getProducts()
+      .then(setProducts)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
-  if (isError) {
-    return <p className="p-6 text-red-500">Error al cargar productos</p>;
-  }
-
-  const filteredProducts = data?.filter((product) =>
-    product.title.toLowerCase().includes(search.toLowerCase()),
-  );
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const start = (page - 1) * ITEMS_PER_PAGE;
+  const end = start + ITEMS_PER_PAGE;
+  const paginatedProducts = products.slice(start, end);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-slate-900 text-black dark:text-white">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Productos</h1>
-        {/* //! El tema de la app lo define el nevegador, pisa mi codigo */}
-        {/* <ThemeToggle /> */}
-        <input
-          type="text"
-          placeholder="Buscar producto..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="mb-6 w-full max-w-md rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {filteredProducts?.map((product) => (
-            <Link to={`/product/${product.id}`}>
-              <div
-                className="
-                    border rounded-xl p-4 shadow transition
-                    bg-white text-black
-                    dark:bg-slate-800 dark:text-white
-                  "
-              >
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="h-40 w-full object-contain mb-4"
-                />
+    <div className="space-y-6">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {paginatedProducts.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
 
-                <h2 className="font-semibold mb-2 line-clamp-2">
-                  {product.title}
-                </h2>
+      <div className="flex items-center justify-center gap-4">
+        <button
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 rounded-lg border disabled:opacity-50"
+        >
+          ← Anterior
+        </button>
 
-                <p className="text-sm text-gray-600 mb-2">${product.price}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <span className="text-sm text-zinc-500">
+          Página {page} de {totalPages}
+        </span>
+
+        <button
+          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+          disabled={page === totalPages}
+          className="px-4 py-2 rounded-lg border disabled:opacity-50"
+        >
+          Siguiente →
+        </button>
       </div>
     </div>
   );
-};
-
-export default ProductsPage;
+}
