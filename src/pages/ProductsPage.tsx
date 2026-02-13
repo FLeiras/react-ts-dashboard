@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useProducts } from '../hooks/useProducts';
-import ThemeToggle from '../components/ThemeToggle';
+// import ThemeToggle from '../components/ThemeToggle';
 
 const ProductsPage = () => {
   const { data, isLoading, isError } = useProducts();
@@ -24,7 +24,8 @@ const ProductsPage = () => {
     <div className="min-h-screen bg-gray-100 dark:bg-slate-900 text-black dark:text-white">
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-6">Productos</h1>
-        <ThemeToggle />
+        {/* //! El tema de la app lo define el nevegador, pisa mi codigo */}
+        {/* <ThemeToggle /> */}
         <input
           type="text"
           placeholder="Buscar producto..."
@@ -32,7 +33,6 @@ const ProductsPage = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="mb-6 w-full max-w-md rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filteredProducts?.map((product) => (
             <Link to={`/product/${product.id}`}>
