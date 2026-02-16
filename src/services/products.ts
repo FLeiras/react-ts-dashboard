@@ -21,3 +21,13 @@ export async function getProductById(id: string): Promise<Product> {
 
   return res.json();
 }
+
+export async function getCategories(): Promise<string[]> {
+  const res = await fetch(`${API_URL}/categories`);
+
+  if (!res.ok) {
+    throw new Error('Error al obtener categorías');
+  }
+
+  return res.json();
+}
