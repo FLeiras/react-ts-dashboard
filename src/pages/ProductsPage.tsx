@@ -1,49 +1,56 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+
+import { useProducts } from '../hooks/useProducts';
 import ProductCard from '../components/ProductCard';
-import { getProducts, getCategories } from '../services/products';
-import type { Product } from '../types/Product';
+import { useCategories } from '../hooks/useCategories';
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
+import SearchBar from '../components/SearchBar';
+import { useDebounce } from '../hooks/useDebounce';
 
 const ITEMS_PER_PAGE = 6;
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: products = [], isLoading } = useProducts();
+  const { data: categories = [] } = useCategories();
+
   const [page, setPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search);
 
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  useEffect(() => {
-    Promise.all([getProducts(), getCategories()])
-      .then(([productsData, categoriesData]) => {
-        setProducts(productsData);
-        setCategories(categoriesData);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
+  //! reset de página al filtrar
   useEffect(() => {
     setPage(1);
   }, [selectedCategory]);
 
-  const filteredProducts =
-    selectedCategory === 'all'
-      ? products
-      : products.filter((p) => p.category === selectedCategory);
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedCategory === 'all' || product.category === selectedCategory;
+
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(debouncedSearch.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-
   const start = (page - 1) * ITEMS_PER_PAGE;
-  const end = start + ITEMS_PER_PAGE;
-
-  const paginatedProducts = filteredProducts.slice(start, end);
+  const paginatedProducts = filteredProducts.slice(
+    start,
+    start + ITEMS_PER_PAGE,
+  );
 
   return (
     <div className="space-y-6">
+      {/* //! filtro */}
       <div className="flex items-center gap-4">
         <label className="text-sm text-zinc-500">Categoría:</label>
-
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder="Buscar producto..."
+        />
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -59,11 +66,16 @@ export default function ProductsPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {paginatedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {isLoading
+          ? Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))
+          : paginatedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
       </div>
 
+      {/* //! paginado */}
       <div className="flex items-center justify-center gap-4">
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
