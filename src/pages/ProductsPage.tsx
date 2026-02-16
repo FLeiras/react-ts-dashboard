@@ -6,13 +6,17 @@ import { useCategories } from '../hooks/useCategories';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SearchBar from '../components/SearchBar';
 import { useDebounce } from '../hooks/useDebounce';
-import { uperFirstLetter } from '../utils/uperFirstLetter';
+import { useTranslation } from '../hooks/useTranslation';
+import { getCategoryLabel } from '../utils/getCategoryLabel';
+import { useLanguage } from '../context/LanguageContext';
 
 const ITEMS_PER_PAGE = 6;
 
 export default function ProductsPage() {
   const { data: products = [], isLoading } = useProducts();
   const { data: categories = [] } = useCategories();
+  const { t } = useTranslation();
+  const { language } = useLanguage();
 
   const [page, setPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -46,21 +50,24 @@ export default function ProductsPage() {
     <div className="space-y-6">
       {/* //! filtro */}
       <div className="flex items-center gap-4">
-        <label className="text-sm text-zinc-500">Categoría:</label>
         <SearchBar
           value={search}
           onChange={setSearch}
-          placeholder="Buscar producto..."
+          placeholder={t.products.searchPlaceholder}
         />
+        <label className="text-sm text-zinc-500">
+          {t.products.categories}:
+        </label>
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="border rounded-lg px-3 py-2 bg-white dark:bg-zinc-900"
         >
-          <option value="all">Todas</option>
+          <option value="all">{language === 'es' ? 'Todas' : 'All'}</option>
+
           {categories.map((cat) => (
             <option key={cat} value={cat}>
-              {uperFirstLetter(cat)}
+              {getCategoryLabel(cat, language)}
             </option>
           ))}
         </select>
@@ -83,7 +90,7 @@ export default function ProductsPage() {
           disabled={page === 1}
           className="px-4 py-2 rounded-lg border disabled:opacity-50"
         >
-          ← Anterior
+          ← {t.paginated.previus}
         </button>
 
         <span className="text-sm text-zinc-500">
@@ -95,7 +102,7 @@ export default function ProductsPage() {
           disabled={page === totalPages}
           className="px-4 py-2 rounded-lg border disabled:opacity-50"
         >
-          Siguiente →
+          {t.paginated.next} →
         </button>
       </div>
     </div>

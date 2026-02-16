@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { Package, Users, Settings } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 type Props = {
   collapsed: boolean;
@@ -9,6 +10,8 @@ const baseLink =
   'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors';
 
 export default function Sidebar({ collapsed }: Props) {
+  const { t } = useTranslation();
+
   return (
     <aside
       className={`
@@ -30,7 +33,7 @@ export default function Sidebar({ collapsed }: Props) {
           }
         >
           <Package size={18} />
-          {!collapsed && <span>Productos</span>}
+          {!collapsed && <span>{t.sidebar.products}</span>}
         </NavLink>
 
         <NavLink
@@ -44,7 +47,7 @@ export default function Sidebar({ collapsed }: Props) {
           }
         >
           <Users size={18} />
-          {!collapsed && <span>Usuarios</span>}
+          {!collapsed && <span>{t.sidebar.users}</span>}
         </NavLink>
 
         <NavLink
@@ -58,7 +61,7 @@ export default function Sidebar({ collapsed }: Props) {
           }
         >
           <Settings size={18} />
-          {!collapsed && <span>Configuración</span>}
+          {!collapsed && <span>{t.sidebar.settings}</span>}
         </NavLink>
       </nav>
     </aside>
