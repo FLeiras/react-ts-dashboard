@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useUsers } from '../hooks/useUsers';
 import SearchBar from '../components/SearchBar';
 import { useDebounce } from '../hooks/useDebounce';
+import HighlightText from '../components/HighlightText';
+import { uperFirstLetter } from '../utils/uperFirstLetter';
 
 export default function UsersPage() {
   const { data: users, isLoading, isError } = useUsers();
@@ -49,10 +51,19 @@ export default function UsersPage() {
           <tbody>
             {filteredUsers?.map((user) => (
               <tr key={user.id} className="border-t">
-                <td className="p-3">
-                  {user.name.firstname} {user.name.lastname}
+                <td className="p-3 font-medium">
+                  <HighlightText
+                    text={`${uperFirstLetter(user.name.firstname)} ${uperFirstLetter(user.name.lastname)}`}
+                    highlight={debouncedSearch}
+                  />
                 </td>
-                <td className="p-3">{user.email}</td>
+
+                <td className="p-3 text-sm text-zinc-500">
+                  <HighlightText
+                    text={user.email}
+                    highlight={debouncedSearch}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>

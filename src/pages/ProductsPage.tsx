@@ -6,6 +6,7 @@ import { useCategories } from '../hooks/useCategories';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SearchBar from '../components/SearchBar';
 import { useDebounce } from '../hooks/useDebounce';
+import { uperFirstLetter } from '../utils/uperFirstLetter';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -59,7 +60,7 @@ export default function ProductsPage() {
           <option value="all">Todas</option>
           {categories.map((cat) => (
             <option key={cat} value={cat}>
-              {cat}
+              {uperFirstLetter(cat)}
             </option>
           ))}
         </select>
