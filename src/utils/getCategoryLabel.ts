@@ -1,12 +1,5 @@
-import { categoryTranslations } from '../i18n/categories';
+import type { Category } from '../types/Category';
 
-type Language = 'en' | 'es';
-type CategoryKey = keyof typeof categoryTranslations;
-
-export function getCategoryLabel(category: string, language: Language) {
-  if (category in categoryTranslations) {
-    return categoryTranslations[category as CategoryKey][language];
-  }
-
-  return category;
+export function getCategoryLabel(category: Category, language: 'es' | 'en') {
+  return language === 'es' ? category.nameEs : category.nameEn;
 }

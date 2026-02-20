@@ -1,33 +1,35 @@
 import type { Product } from '../types/Product';
+import { http } from '../api/http';
+import type { CreateProduct } from '../types/CreateProducts';
+import type { Category } from '../types/Category';
 
-const API_URL = 'https://fakestoreapi.com/products';
+const mapProduct = (product: any): Product => ({
+  id: product.id,
+  title: product.title,
+  price: product.price,
+  description: product.description,
+  image: product.image,
+  category: product.category?.nameEn ?? 'unknown',
+});
 
 export const getProducts = async (): Promise<Product[]> => {
-  const res = await fetch(API_URL);
-
-  if (!res.ok) {
-    throw new Error('Error fetching products');
-  }
-
-  return res.json();
+  const { data } = await http.get('/products');
+  return data.map(mapProduct);
 };
 
-export async function getProductById(id: string): Promise<Product> {
-  const res = await fetch(`${API_URL}/${id}`);
+export const getProductById = async (id: number): Promise<Product> => {
+  const { data } = await http.get(`/products/${id}`);
+  return mapProduct(data);
+};
 
-  if (!res.ok) {
-    throw new Error('Error al obtener el producto');
-  }
+export const createProduct = async (
+  payload: CreateProduct,
+): Promise<Product> => {
+  const { data } = await http.post('/products', payload);
+  return data;
+};
 
-  return res.json();
-}
-
-export async function getCategories(): Promise<string[]> {
-  const res = await fetch(`${API_URL}/categories`);
-
-  if (!res.ok) {
-    throw new Error('Error al obtener categorías');
-  }
-
-  return res.json();
+export async function getCategories(): Promise<Category[]> {
+  const { data } = await http.get<Category[]>('/categories');
+  return data;
 }

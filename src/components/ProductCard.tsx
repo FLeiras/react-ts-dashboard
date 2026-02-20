@@ -20,7 +20,7 @@ export default function ProductCard({ product }: Props) {
 
         {/* Contenido */}
         <div className="flex-1 mt-4">
-          <h3 className="font-medium line-clamp-2">{product.title}</h3>
+          <h3 className="font-medium line-clamp-2">{product.description}</h3>
         </div>
 
         {/* Precio siempre abajo */}
